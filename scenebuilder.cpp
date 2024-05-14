@@ -1,8 +1,9 @@
+#include "RAYLIB.H"
+#include "planet.h"
 #include "scenebuilder.h"
 #include <iostream>
-#include "raylib.h"
 
-void scene::UpdateScene(){
+void scene::UpdateScene() {
 
 	uint32_t currentTime = GetFrameTime();
 	float dt = (currentTime - upTime) / 1000.0f;
@@ -13,51 +14,41 @@ void scene::RenderScene() {
 	//Delta time to calculate ur frame ticks, the higher the DT the more accurate the physics
 	//At the cost of performance obviously 
 	float dt = 0.060f;
-
-	//particle objects, they take in a Vec2 with floats, next is a mass value and a pinned state
-	//To use Vec2's in constructors either do {pos.x, pos.y} in the spot that takes in the vector 
-	//Or simply pass in the fully initialized vector by its variable name
-	particle bA(Vec2(840.0, 155.0), 1.05f, false);
-	particle bB(Vec2(940.0, 250.0), 1.05f, false);
-
-	//Bonds objects to connect two particles together, they take in two particle objects as parameters.
-	bonds bAB(bA, bB);
-	//Set ur fps
 	SetTargetFPS(60);
 	//Init ur window
-	InitWindow(WIDTH, HEIGHT, "EXODIA");
+	InitWindow(WIDTH, HEIGHT, "SOLAR_SYSTEM_V1");
+	planet planet1({ 200, 200 }, 5.97 * 1e24, 15);
+	planet planet2({ 800, 300 }, 7.34 * 1e22, 50);
 	
+	planet1.SetVelocityX(0);
+	planet1.SetVelocityY(0);
+
+	planet2.SetVelocityX(0);
+	planet2.SetVelocityY(0);
+
 	//Begin the game loop
 	while (!WindowShouldClose()) {
-		//Begin the drawing process
-		BeginDrawing();
-		scene::MoveBall(bA);
-		//This function clears the screen after each refresh and ALWAYS has to be at the top before any draw calls, but under the first one
-		ClearBackground(BLACK);
-		
-		//Here just call the colliding methods and update methods for both types of objects 
-		//The order of ur calls should be collision > update > draw 
-		//Frame updates occur from top to bottom
-		bA.Colliding(WIDTH, HEIGHT);
-		bA.UpdateBall(dt, WIDTH, HEIGHT);
-		bA.DrawBall();
-		bB.Colliding(WIDTH, HEIGHT);
-		bB.UpdateBall(dt, WIDTH, HEIGHT);
-		bB.DrawBall();
 
-		bAB.DrawBonds();
-		bAB.updateBonds(bA, bB);
+		planet1.UpdatePlanet(GetFrameTime());
+		planet2.UpdatePlanet(GetFrameTime());
+
+		//aaaaaaaaa WHAT THE FUCK IS THIS????
+		double distance_x = (planet2.pos.y - planet1.pos.y);
+		double distance_y = (planet2.pos.x - planet1.pos.x);
+
+		planet2.acceleration.x = planet1.forceOfAttraction(planet2.GetMass(), distance_x) / planet1.GetMass();
+		planet2.acceleration.y = planet1.forceOfAttraction(planet2.GetMass(), distance_y) / planet1.GetMass();
+
+		planet1.acceleration.y = planet2.forceOfAttraction(planet1.GetMass(), distance_y) / planet2.GetMass();
+		planet1.acceleration.x = planet2.forceOfAttraction(planet1.GetMass(), distance_x) / planet2.GetMass();
+		
+		BeginDrawing();
+		ClearBackground(RAYWHITE); // Clear the screen
+		planet1.DrawBall();
+		planet2.DrawBall();
+
 		EndDrawing();
 	}
 
-
-	CloseWindow();
 }
 
-//Move ball function that takes in mouse input to move any ball u pass in 
-void scene::MoveBall(particle& p){
-	if (IsMouseButtonDown(0)) {
-		p.pos.x = GetMouseX();
-		p.pos.y = GetMouseY();
-	}
-}

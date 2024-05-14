@@ -1,7 +1,8 @@
 #include "bonds.h"
+#include "raylib.h"
 #include <iostream>
 
-bonds::bonds(particle& p0,particle& p1) 
+bonds::bonds(particle& p0, particle& p1)
 	:
 	p0(p0),
 	p1(p1),
@@ -35,8 +36,8 @@ void bonds::updateBonds(particle& p0, particle& p1) {
 	}
 }
 
-void bonds::DrawBonds(){
-	DrawLineV({ p0.pos.x, p0.pos.y}, {p1.pos.x, p1.pos.y}, WHITE);
+void bonds::DrawBonds() {
+	DrawLineV({ p0.pos.x, p0.pos.y }, { p1.pos.x, p1.pos.y }, WHITE);
 }
 
 float bonds::getDist(particle& p0, particle& p1)

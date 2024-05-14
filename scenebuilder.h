@@ -10,8 +10,8 @@ private:
 	static constexpr int WIDTH = 1280;
 	static constexpr int HEIGHT = 720;
 	//DT
-	uint32_t upTime; 
-public: 
+	uint32_t upTime;
+public:
 
 	//Default constructor and destructor
 	scene() = default;
@@ -19,6 +19,5 @@ public:
 
 	void UpdateScene();
 	void RenderScene();
-	void MoveBall(particle& p);
 
 };
